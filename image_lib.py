@@ -1,6 +1,6 @@
 from apod_api import get_apod_image_url, get_apod_info
 import requests
-import re, os, ctypes, random
+import os, ctypes, random
 
 '''
 Library of useful functions for working with images.
@@ -8,7 +8,7 @@ Library of useful functions for working with images.
 def main():
     # TODO: Add code to test the functions in this module
     #apod_date = "2021-08-25" # Video File.
-    apod_date = '2021-05-04'
+    apod_date = '2021-05-06'
     apod_info_dict = get_apod_info(apod_date)
     image_url = get_apod_image_url(apod_info_dict)
     pass
@@ -56,7 +56,8 @@ def save_image_file(image_data, image_path,):
     """
     # TODO: Complete function body
     # Set Directory and file path
-    file_path ='newpic.jpg'
+    x = random.randint(1,1000)
+    file_path = str(x,) + '.jpg'
     installer_path = os.path.join(image_path, file_path)
     if not os.path.isdir(image_path):
         os.makedirs(image_path)
@@ -75,8 +76,8 @@ def set_desktop_background_image(image_path):
         bytes: True, if succcessful. False, if unsuccessful        
     """
     # TODO: Complete function body
-    ctypes.windll.user32.SystemParametersInfoW(20, 0, image_path, 3)
-    return
+    if ctypes.windll.user32.SystemParametersInfoW(20, 0, image_path, 3):
+        return True
 
 def scale_image(image_size, max_size=(800, 600)):
     """Calculates the dimensions of an image scaled to a maximum width
