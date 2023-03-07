@@ -5,13 +5,32 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Apod Desktop",
+            "name": "Image Lib",
+            "type": "python",
+            "request": "launch",
+            "program": "image_lib.py",
+            "console": "integratedTerminal",
+            "justMyCode": true
+            
+        },
+        {
+            "name": "APOD api",
+            "type": "python",
+            "request": "launch",
+            "program": "apod_api.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+        },
+        {
+            "name": "APOD Desktop",
             "type": "python",
             "request": "launch",
             "program": "apod_desktop.py",
             "console": "integratedTerminal",
             "justMyCode": true,
-            "args": ["2025-12-31"]
+            "args": ["2021-05-03"]
         }
+
+        
     ]
 }

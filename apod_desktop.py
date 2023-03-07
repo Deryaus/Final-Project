@@ -13,8 +13,7 @@ Parameters:
 """
 from datetime import date
 from sys import argv, exit
-import os
-import inspect
+import os, re, image_lib, inspect
 
 # Global variables
 image_cache_dir = None  # Full path of image cache directory
@@ -52,7 +51,6 @@ def get_apod_date():
     Returns:
         date: APOD date
     """
-    # TODO: Complete function body
     # Check whether date has been provided from command line parameter
     num_params = len(argv[1]) -1
     # If date has been provided validate format
@@ -60,20 +58,18 @@ def get_apod_date():
         try:
             apod_date = date.fromisoformat(argv[1])
         except ValueError as error:
-            print(f'Error: Invalid date format: {error}')
-            exit('Script aborted')
+            print(f'Error: Invalid date format: {error} \n Script Aborted')
+            exit()
     # Validate date falls within accepted range
     start_date = date.fromisoformat('1995-06-16')
     if apod_date < start_date:
-        print(f'Error: No data before {start_date}')
-        exit('Script Aborted')
+        print(f'Error: No data before {start_date} \n Script Aborted.')
+        exit()
     elif apod_date > date.today():
-        print('Error: APOD date cannot be in the future')
-        print('Script Aborted')
+        print('Error: APOD date cannot be in the future \n Script Aborted')
         exit()
     else:
-        apod_date = date.today.isoformat()
-    
+        apod_date = date.today()
     return apod_date
 
 def get_script_dir():
@@ -181,6 +177,18 @@ def determine_apod_file_path(image_title, image_url):
     Returns:
         str: Full path at which the APOD image file must be saved in the image cache directory
     """
+
+    # Obtain file extension from image_url
+    file_type = re.search('.*(\.*)', image_url)
+    file_extension = file_type.group(1)
+
+    # Remove Leading and trailing white space Chars    
+    x = image_title.strip()
+    #Remove inner spaces with underscores
+    y = re.sub('\s', '_', x)
+    # remove non word chars
+    cleaned_string = re.sub('\W', '', y)
+    file_name = cleaned_string + file_extension
     # TODO: Complete function body
     return
 
