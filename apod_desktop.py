@@ -14,7 +14,7 @@ Parameters:
 --------------------ι𝐍Ⓙย𝐬𝓣ᶤςⒺ Ⓐ𝐍ＹωᕼⒺг𝐄 ᶤ𝐬 ᵃ tｈяᗴＡт ⓉＯ 𝐣υ𝔰ｔ𝐢ᶜⓔ 𝐄V乇яｙ山卄εŘ乇 --------------------"""
 from datetime import date
 from sys import argv, exit
-import os, re, image_lib, inspect
+import os, re, image_lib, inspect, requests
 
 # Global variables
 image_cache_dir = None  # Full path of image cache directory
@@ -62,9 +62,9 @@ def get_apod_date():
             print(f'Error: Invalid date format: {error} \n Script Aborted.')
             exit()
     # Validate date falls within accepted range
-    start_date = date.fromisoformat('1995-06-16')
-    if apod_date < start_date:
-        print(f'Error: No data before {start_date} \n Script Aborted.')
+    START_DATE = date.fromisoformat('1995-06-16')
+    if apod_date < START_DATE:
+        print(f'Error: No data before {START_DATE} \n Script Aborted.')
         exit()
     elif apod_date > date.today():
         print('Error: APOD date cannot be in the future \n Script Aborted.')
@@ -117,8 +117,38 @@ def add_apod_to_cache(apod_date):
         cache successfully or if the APOD already exists in the cache. Zero, if unsuccessful.
     """
     print("APOD date:", apod_date.isoformat())
-    # TODO: Download the APOD information from the NASA API
+    print(f'Getting {apod_date.isoformat()} information from NASA', end=' ')
+    # Download the APOD information from the NASA API
+    URL = 'https://api.nasa.gov/planetary/apod'
+    API_KEY ='9B5p6pJIrJQsag5XemQBqiDzteN66d8sVlqdoZGC'
+    # setup query string parameters.
+    query_string_params = {'api_key': API_KEY,
+                            'date': apod_date,
+                            'thumbs': 'True'}
+    # Send Get request to APOD api.
+    resp_msg = requests.get(URL, params=query_string_params)
+    # Check if GET request was successfull.
+    if resp_msg:
+        apod_info_dict = resp_msg.json()
+        print('...success')
+    else:
+        print(f'failure...\n{resp_msg.status_code} {resp_msg.reason}\nScript Aborted')
+        exit()
+    if apod_info_dict['media_type'] == 'video':
+        image_url = apod_info_dict['thumbnail_url']
+        return image_url
+    else:
+         image_url = apod_info_dict['hdurl']
+    return image_url
+
+    
+    #if print('Apod title:', apod_info_dict['title']):
+
     # TODO: Download the APOD image
+    #image_data = resp_msg.content
+
+
+
     # TODO: Check whether the APOD already exists in the image cache
     # TODO: Save the APOD file to the image cache directory
     # TODO: Add the APOD information to the DB
@@ -180,17 +210,11 @@ def determine_apod_file_path(image_title, image_url):
     """
     # TODO: Complete function body
 
-
     # Obtain file extension from image_url
     file_type = re.search('.*(\..*)', image_url)
     file_extension = file_type.group(1)
-
-    # Remove Leading and trailing white space Chars    
-    x = image_title.strip()
-    # Remove inner spaces with underscores
-    y = re.sub('\s', '_', x)
-    # Remove non word chars
-    cleaned_string = re.sub('\W', '', y)
+    # Cleanup title - remove non word chars, leading and trailing whitespaces, inner spaces replaced with underscores.
+    cleaned_string = re.sub('\W', '', re.sub('\s', '_', image_title.strip()))
     file_name = cleaned_string + file_extension
     
     return

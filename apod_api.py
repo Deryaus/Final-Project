@@ -7,8 +7,7 @@ import requests
 def main():
     apod_date = '2021-05-03'
     apod_info_dict = get_apod_info(apod_date)
-
-    return
+    get_apod_image_url(apod_info_dict)
 
 def get_apod_info(apod_date):
     """Gets information from the NASA API for the Astronomy 
@@ -31,11 +30,10 @@ def get_apod_info(apod_date):
     # Check if GET request was successfull.
     if resp_msg:
         apod_info_dict = resp_msg.json()
-        pass
         return apod_info_dict
     else:
-        print(print(f'Failure... {resp_msg.status_code} {resp_msg.reason}'))
-
+        print(f'Failure... {resp_msg.status_code} {resp_msg.reason}.')
+        exit()
 
 def get_apod_image_url(apod_info_dict):
     """Gets the URL of the APOD image from the dictionary of APOD information.

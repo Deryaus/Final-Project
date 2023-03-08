@@ -30,7 +30,6 @@ def download_image(image_url):
     Returns:
         bytes: Binary image data, if succcessful. None, if unsuccessful.
     """
-    # TODO: Complete function body
     # Send GET request to download file
     resp_msg = requests.get(image_url)
     # Check whether the download was successfull
@@ -53,7 +52,6 @@ def save_image_file(image_data, image_path,):
     Returns:
         bytes: True, if succcessful. False, if unsuccessful
     """
-    # TODO: Complete function body
     # Set Directory and file path
     x = random.randint(1,1000)
     file_path = str(x) + '.jpg'
@@ -61,9 +59,13 @@ def save_image_file(image_data, image_path,):
     if not os.path.isdir(image_path):
         os.makedirs(image_path)
     # write binary Data as JPEG
-    with open(installer_path, 'wb') as file:
-        file.write(image_data)
-        return installer_path
+    try:
+        with open(installer_path, 'wb') as file:
+            file.write(image_data)
+            return installer_path
+    except ValueError as error:
+        print(error)
+        exit()
 
 def set_desktop_background_image(image_path):
     """Sets the desktop background image to a specific image.
