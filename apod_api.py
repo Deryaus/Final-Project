@@ -1,10 +1,10 @@
-'''
+"""--------------------ι𝐍Ⓙย𝐬𝓣ᶤςⒺ Ⓐ𝐍ＹωᕼⒺг𝐄 ᶤ𝐬 ᵃ tｈяᗴＡт ⓉＯ 𝐣υ𝔰ｔ𝐢ᶜⓔ 𝐄V乇яｙ山卄εŘ乇 --------------------
+
 Library for interacting with NASA's Astronomy Picture of the Day API.
-'''
+
+--------------------ι𝐍Ⓙย𝐬𝓣ᶤςⒺ Ⓐ𝐍ＹωᕼⒺг𝐄 ᶤ𝐬 ᵃ tｈяᗴＡт ⓉＯ 𝐣υ𝔰ｔ𝐢ᶜⓔ 𝐄V乇яｙ山卄εŘ乇 --------------------"""
 import requests
-# API Key: 9B5p6pJIrJQsag5XemQBqiDzteN66d8sVlqdoZGC
 def main():
-    # TODO: Add code to test the functions in this module
     apod_date = '2021-05-03'
     apod_info_dict = get_apod_info(apod_date)
 
@@ -22,17 +22,20 @@ def get_apod_info(apod_date):
     """
     URL = 'https://api.nasa.gov/planetary/apod'
     API_KEY ='9B5p6pJIrJQsag5XemQBqiDzteN66d8sVlqdoZGC'
-    # setup query string parameters
+    # setup query string parameters.
     query_string_params = {'api_key': API_KEY,
                            'date': apod_date,
                            'thumbs': 'True'}
-    # send Get request to APOD api
+    # send Get request to APOD api.
     resp_msg = requests.get(URL, params=query_string_params)
-    # Check if GET request was successfull
+    # Check if GET request was successfull.
     if resp_msg:
         apod_info_dict = resp_msg.json()
         pass
-    return apod_info_dict
+        return apod_info_dict
+    else:
+        print(print(f'Failure... {resp_msg.status_code} {resp_msg.reason}'))
+
 
 def get_apod_image_url(apod_info_dict):
     """Gets the URL of the APOD image from the dictionary of APOD information.

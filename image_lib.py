@@ -1,24 +1,23 @@
+"""--------------------ι𝐍Ⓙย𝐬𝓣ᶤςⒺ Ⓐ𝐍ＹωᕼⒺг𝐄 ᶤ𝐬 ᵃ tｈяᗴＡт ⓉＯ 𝐣υ𝔰ｔ𝐢ᶜⓔ 𝐄V乇яｙ山卄εŘ乇 --------------------
+
+Library of useful functions for working with images.
+
+
+--------------------ι𝐍Ⓙย𝐬𝓣ᶤςⒺ Ⓐ𝐍ＹωᕼⒺг𝐄 ᶤ𝐬 ᵃ tｈяᗴＡт ⓉＯ 𝐣υ𝔰ｔ𝐢ᶜⓔ 𝐄V乇яｙ山卄εŘ乇 -------------------- """
 from apod_api import get_apod_image_url, get_apod_info
 import requests
 import os, ctypes, random
 
-'''
-Library of useful functions for working with images.
-'''
+
 def main():
-    # TODO: Add code to test the functions in this module
-    #apod_date = "2021-08-25" # Video File.
+    
+    # apod_date = "2021-08-25" # Video File.
     apod_date = '2021-05-06'
     apod_info_dict = get_apod_info(apod_date)
     image_url = get_apod_image_url(apod_info_dict)
-    pass
     image_data = download_image(image_url)
     image_path = save_image_file(image_data, r"C:\temp\images")
     set_desktop_background_image(image_path)
-
-
-
-    return
 
 def download_image(image_url):
     """Downloads an image from a specified URL.
@@ -32,7 +31,7 @@ def download_image(image_url):
         bytes: Binary image data, if succcessful. None, if unsuccessful.
     """
     # TODO: Complete function body
-    # Send get request to download file
+    # Send GET request to download file
     resp_msg = requests.get(image_url)
     # Check whether the download was successfull
     if resp_msg.status_code == requests.codes.ok:
@@ -57,14 +56,14 @@ def save_image_file(image_data, image_path,):
     # TODO: Complete function body
     # Set Directory and file path
     x = random.randint(1,1000)
-    file_path = str(x,) + '.jpg'
+    file_path = str(x) + '.jpg'
     installer_path = os.path.join(image_path, file_path)
     if not os.path.isdir(image_path):
         os.makedirs(image_path)
+    # write binary Data as JPEG
     with open(installer_path, 'wb') as file:
         file.write(image_data)
         return installer_path
-
 
 def set_desktop_background_image(image_path):
     """Sets the desktop background image to a specific image.
@@ -75,7 +74,6 @@ def set_desktop_background_image(image_path):
     Returns:
         bytes: True, if succcessful. False, if unsuccessful        
     """
-    # TODO: Complete function body
     if ctypes.windll.user32.SystemParametersInfoW(20, 0, image_path, 3):
         return True
 

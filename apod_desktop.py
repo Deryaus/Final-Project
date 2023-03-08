@@ -1,4 +1,5 @@
-""" 
+"""--------------------ι𝐍Ⓙย𝐬𝓣ᶤςⒺ Ⓐ𝐍ＹωᕼⒺг𝐄 ᶤ𝐬 ᵃ tｈяᗴＡт ⓉＯ 𝐣υ𝔰ｔ𝐢ᶜⓔ 𝐄V乇яｙ山卄εŘ乇 --------------------
+
 COMP 593 - Final Project
 
 Description: 
@@ -10,7 +11,7 @@ Usage:
 
 Parameters:
   apod_date = APOD date (format: YYYY-MM-DD)
-"""
+--------------------ι𝐍Ⓙย𝐬𝓣ᶤςⒺ Ⓐ𝐍ＹωᕼⒺг𝐄 ᶤ𝐬 ᵃ tｈяᗴＡт ⓉＯ 𝐣υ𝔰ｔ𝐢ᶜⓔ 𝐄V乇яｙ山卄εŘ乇 --------------------"""
 from datetime import date
 from sys import argv, exit
 import os, re, image_lib, inspect
@@ -58,7 +59,7 @@ def get_apod_date():
         try:
             apod_date = date.fromisoformat(argv[1])
         except ValueError as error:
-            print(f'Error: Invalid date format: {error} \n Script Aborted')
+            print(f'Error: Invalid date format: {error} \n Script Aborted.')
             exit()
     # Validate date falls within accepted range
     start_date = date.fromisoformat('1995-06-16')
@@ -66,7 +67,7 @@ def get_apod_date():
         print(f'Error: No data before {start_date} \n Script Aborted.')
         exit()
     elif apod_date > date.today():
-        print('Error: APOD date cannot be in the future \n Script Aborted')
+        print('Error: APOD date cannot be in the future \n Script Aborted.')
         exit()
     else:
         apod_date = date.today()
@@ -177,19 +178,21 @@ def determine_apod_file_path(image_title, image_url):
     Returns:
         str: Full path at which the APOD image file must be saved in the image cache directory
     """
+    # TODO: Complete function body
+
 
     # Obtain file extension from image_url
-    file_type = re.search('.*(\.*)', image_url)
+    file_type = re.search('.*(\..*)', image_url)
     file_extension = file_type.group(1)
 
     # Remove Leading and trailing white space Chars    
     x = image_title.strip()
-    #Remove inner spaces with underscores
+    # Remove inner spaces with underscores
     y = re.sub('\s', '_', x)
-    # remove non word chars
+    # Remove non word chars
     cleaned_string = re.sub('\W', '', y)
     file_name = cleaned_string + file_extension
-    # TODO: Complete function body
+    
     return
 
 def get_apod_info(image_id):
