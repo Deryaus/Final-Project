@@ -14,7 +14,7 @@ Parameters:
 --------------------ι𝐍Ⓙย𝐬𝓣ᶤςⒺ Ⓐ𝐍ＹωᕼⒺг𝐄 ᶤ𝐬 ᵃ tｈяᗴＡт ⓉＯ 𝐣υ𝔰ｔ𝐢ᶜⓔ 𝐄V乇яｙ山卄εŘ乇 --------------------"""
 from datetime import date
 from sys import argv, exit
-import os, re, image_lib, inspect, requests
+import os, re, image_lib, inspect, requests,hashlib
 
 # Global variables
 image_cache_dir = None  # Full path of image cache directory
@@ -33,10 +33,10 @@ def main():
 
     # Add the APOD for the specified date to the cache
     apod_id = add_apod_to_cache(apod_date)
-
+    pass
     # Get the information for the APOD from the DB
     apod_info = get_apod_info(apod_id)
-
+    pass
     # Set the APOD as the desktop background image
     if apod_id != 0:
         image_lib.set_desktop_background_image(apod_info['file_path'])
@@ -128,31 +128,30 @@ def add_apod_to_cache(apod_date):
     # Send Get request to APOD api.
     resp_msg = requests.get(URL, params=query_string_params)
     # Check if GET request was successfull.
-    if resp_msg:
+    if resp_msg.status_code == requests.codes.ok:
         apod_info_dict = resp_msg.json()
         print('...success')
+     # Download Image.  
+    if apod_info_dict['media_type'] == 'video':
+        print('APOD title:', apod_info_dict['title'])
+        print('APOD URL: ', apod_info_dict['thumbnail_url'])
+        print('Downloading image from ', apod_info_dict['thumbnail_url'])
+        image_data = resp_msg.content
+        image_sha256 = hashlib.sha256(image_data).hexdigest() 
+    if apod_info_dict['media_type'] == 'image':
+        print('APOD title:', apod_info_dict['title'])
+        print('APOD URL:', apod_info_dict['hdurl'])
+        print('Downloading image from', apod_info_dict['hdurl'] )
+        image_data = resp_msg.content
+        image_sha256 = hashlib.sha256(image_data).hexdigest()
     else:
+        resp_msg.status_code != requests.codes.ok
         print(f'failure...\n{resp_msg.status_code} {resp_msg.reason}\nScript Aborted')
         exit()
-    if apod_info_dict['media_type'] == 'video':
-        image_url = apod_info_dict['thumbnail_url']
-        return image_url
-    else:
-         image_url = apod_info_dict['hdurl']
-    return image_url
-
-    
-    #if print('Apod title:', apod_info_dict['title']):
-
-    # TODO: Download the APOD image
-    #image_data = resp_msg.content
-
-
-
     # TODO: Check whether the APOD already exists in the image cache
     # TODO: Save the APOD file to the image cache directory
     # TODO: Add the APOD information to the DB
-    return 0
+    #return 0
 
 def add_apod_to_db(title, explanation, file_path, sha256):
     """Adds specified APOD information to the image cache DB.
@@ -209,13 +208,15 @@ def determine_apod_file_path(image_title, image_url):
         str: Full path at which the APOD image file must be saved in the image cache directory
     """
     # TODO: Complete function body
-
     # Obtain file extension from image_url
     file_type = re.search('.*(\..*)', image_url)
     file_extension = file_type.group(1)
     # Cleanup title - remove non word chars, leading and trailing whitespaces, inner spaces replaced with underscores.
     cleaned_string = re.sub('\W', '', re.sub('\s', '_', image_title.strip()))
     file_name = cleaned_string + file_extension
+
+    print()
+    
     
     return
 

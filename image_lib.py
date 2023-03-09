@@ -8,7 +8,6 @@ from apod_api import get_apod_image_url, get_apod_info
 import requests
 import os, ctypes, random
 
-
 def main():
     
     # apod_date = "2021-08-25" # Video File.
@@ -28,7 +27,7 @@ def download_image(image_url):
         image_url (str): URL of image
 
     Returns:
-        bytes: Binary image data, if succcessful. None, if unsuccessful.
+        Bytes: Binary image data, if succcessful. None, if unsuccessful.
     """
     # Send GET request to download file
     resp_msg = requests.get(image_url)
@@ -39,6 +38,7 @@ def download_image(image_url):
         return image_data
     else:
         print(f'Failed to download file \n {resp_msg.status_code} {resp_msg.reason}')
+        exit()
 
 def save_image_file(image_data, image_path,):
     """Saves image data as a file on disk.
@@ -50,22 +50,23 @@ def save_image_file(image_data, image_path,):
         image_path (str): Path to save image file
 
     Returns:
-        bytes: True, if succcessful. False, if unsuccessful
+        Bool: True, if succcessful. False, if unsuccessful
     """
     # Set Directory and file path
     x = random.randint(1,1000)
     file_path = str(x) + '.jpg'
     installer_path = os.path.join(image_path, file_path)
-    if not os.path.isdir(image_path):
-        os.makedirs(image_path)
     # write binary Data as JPEG
     try:
+        if not os.path.isdir(image_path):
+            os.makedirs(image_path)
         with open(installer_path, 'wb') as file:
             file.write(image_data)
-            return installer_path
-    except ValueError as error:
+            return True
+    except Exception as error:
         print(error)
         exit()
+    
 
 def set_desktop_background_image(image_path):
     """Sets the desktop background image to a specific image.
@@ -74,10 +75,14 @@ def set_desktop_background_image(image_path):
         image_path (str): Path of image file
 
     Returns:
-        bytes: True, if succcessful. False, if unsuccessful        
+        Bool: True, if succcessful. False, if unsuccessful        
     """
-    if ctypes.windll.user32.SystemParametersInfoW(20, 0, image_path, 3):
-        return True
+    try:
+        if ctypes.windll.user32.SystemParametersInfoW(20, 0, image_path, 3):
+            return True
+    except Exception as error:
+        print(error)
+        exit()
 
 def scale_image(image_size, max_size=(800, 600)):
     """Calculates the dimensions of an image scaled to a maximum width
