@@ -6,12 +6,12 @@ Library of useful functions for working with images.
 --------------------ι𝐍Ⓙย𝐬𝓣ᶤςⒺ Ⓐ𝐍ＹωᕼⒺг𝐄 ᶤ𝐬 ᵃ tｈяᗴＡт ⓉＯ 𝐣υ𝔰ｔ𝐢ᶜⓔ 𝐄V乇яｙ山卄εŘ乇 -------------------- """
 from apod_api import get_apod_image_url, get_apod_info
 import requests
-import os, ctypes, random
+import os, ctypes, random, string, struct
 
 def main():
     
     # apod_date = "2021-08-25" # Video File.
-    apod_date = '2021-05-06'
+    apod_date = '2014-05-03'
     apod_info_dict = get_apod_info(apod_date)
     image_url = get_apod_image_url(apod_info_dict)
     image_data = download_image(image_url)
@@ -53,8 +53,8 @@ def save_image_file(image_data, image_path,):
         Bool: True, if succcessful. False, if unsuccessful
     """
     # Set Directory and file path
-    x = random.randint(1,1000)
-    file_path = str(x) + '.jpg'
+    file_name = string.ascii_letters
+    file_path = ''.join(random.choice(file_name) for i in range(12)) + ".jpg"
     installer_path = os.path.join(image_path, file_path)
     # write binary Data as JPEG
     try:
@@ -62,7 +62,7 @@ def save_image_file(image_data, image_path,):
             os.makedirs(image_path)
         with open(installer_path, 'wb') as file:
             file.write(image_data)
-            return True
+            return  installer_path
     except Exception as error:
         print(error)
         exit()
@@ -78,7 +78,11 @@ def set_desktop_background_image(image_path):
         Bool: True, if succcessful. False, if unsuccessful        
     """
     try:
-        if ctypes.windll.user32.SystemParametersInfoW(20, 0, image_path, 3):
+        if struct.calcsize('P') * 8 == 64:
+            ctypes.windll.user32.SystemParametersInfoW(20, 0, image_path, 3)
+            return True
+        else:
+            ctypes.windll.user32.SystemParametersInfoA(20, 0, image_path, 3)
             return True
     except Exception as error:
         print(error)

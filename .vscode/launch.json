@@ -5,16 +5,35 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Image Lib",
+            "name": "apod_desktop Wrong date format",
+            "type": "python",
+            "request": "launch",
+            "program": "apod_desktop.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": ["Jan 19th, 2022"]
+        },
+        {
+            "name": "apod_desktop Video-File",
+            "type": "python",
+            "request": "launch",
+            "program": "apod_desktop.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "2021-08-25"
+            ]
+        },
+        {
+            "name": "Image_lib",
             "type": "python",
             "request": "launch",
             "program": "image_lib.py",
             "console": "integratedTerminal",
             "justMyCode": true
-            
         },
         {
-            "name": "APOD api",
+            "name": "apod_api",
             "type": "python",
             "request": "launch",
             "program": "apod_api.py",
@@ -22,15 +41,15 @@
             "justMyCode": true,
         },
         {
-            "name": "APOD Desktop",
+            "name": "apod_Desktop Image-File",
             "type": "python",
             "request": "launch",
             "program": "apod_desktop.py",
             "console": "integratedTerminal",
             "justMyCode": true,
-            "args": ["2021-05-03"]
+            "args": [
+                "2021-05-03"
+            ]
         }
-
-        
     ]
 }
