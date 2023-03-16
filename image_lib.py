@@ -77,15 +77,18 @@ def set_desktop_background_image(image_path):
     Returns:
         Bool: True, if succcessful. False, if unsuccessful        
     """
+    print(f'Setting desktop to {image_path}', end='')
     try:
         if struct.calcsize('P') * 8 == 64:
             ctypes.windll.user32.SystemParametersInfoW(20, 0, image_path, 3)
+            print('...success!')
             return True
         else:
             ctypes.windll.user32.SystemParametersInfoA(20, 0, image_path, 3)
+            print('...success!')
             return True
     except Exception as error:
-        print(error)
+        print(f'...failure \n{error}')
         exit()
 
 def scale_image(image_size, max_size=(800, 600)):

@@ -10,6 +10,7 @@ import inspect
 import os
 import apod_desktop
 
+
 # Determine the path and parent directory of this script
 script_path = os.path.abspath(inspect.getframeinfo(inspect.currentframe()).filename)
 script_dir = os.path.dirname(script_path)

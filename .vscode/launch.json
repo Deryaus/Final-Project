@@ -5,10 +5,18 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "apod_viewer",
+            "type": "python",
+            "request": "launch",
+            "program": "apod_viewer.py",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
             "name": "APOD_desktop - no date",
             "type": "python",
             "request": "launch",
-            "program": "${file}",
+            "program": "apod_desktop.py",
             "console": "integratedTerminal",
             "justMyCode": true
         },
@@ -31,7 +39,8 @@
             "console": "integratedTerminal",
             "justMyCode": true,
             "args": [
-                "2021-08-25"
+                //"2021-08-25",
+                "2022-05-09"
             ]
         },
         {
@@ -58,7 +67,11 @@
             "console": "integratedTerminal",
             "justMyCode": true,
             "args": [
-                "2022-05-03"
+                //"2022-05-03"
+                //"2021-05-06"
+                //"2019-05-03"
+                //"1997-05-03"
+                "1998-07-20"
             ]
         }
     ]
