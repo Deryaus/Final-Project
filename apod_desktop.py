@@ -61,8 +61,6 @@ def get_apod_date():
         except ValueError as error:
             print(f'Error: Invalid date format: {error} \n Script Aborted.')
             exit()
-   
-    #return apod_date
     # Validate date falls within accepted range
         START_DATE = date.fromisoformat('1995-06-16')
         if apod_date < START_DATE:
@@ -152,45 +150,52 @@ def add_apod_to_cache(apod_date):
     # Send Get request to APOD api.
     resp_msg = requests.get(URL, params=query_string_params)
     # Check if GET request was successfull.
-    if resp_msg.status_code == requests.codes.ok:
+    #if resp_msg.status_code == requests.codes.ok:
+    if resp_msg.ok:
         apod_info_dict = resp_msg.json()
         print('...success')
     elif resp_msg.status_code != requests.codes.ok:
         print(f'failure...\n{resp_msg.status_code} {resp_msg.reason}\nScript Aborted')
         exit()
      # Download Image.  
+     # TODO FIx this shit
     if apod_info_dict['media_type'] == 'video':
         print('APOD title:', apod_info_dict['title'])
-        print('APOD URL: ', apod_info_dict['thumbnail_url'])
+        print('APOD URL: ', apod_info_dict['url'])
         print('Downloading image from ', apod_info_dict['thumbnail_url'] )
-        image_data = resp_msg.content
-        image_sha256 = hashlib.sha256(image_data).hexdigest()
-        #image_id = get_apod_id_from_db(image_sha256)
-        file_path = determine_apod_file_path(apod_info_dict['title'], apod_info_dict['thumbnail_url'])
+        image_bytes_resp = requests.get(apod_info_dict['thumbnail_url'])
+        image_bytes = image_bytes_resp.content
+        image_sha256 = hashlib.sha256(image_bytes).hexdigest()
+        image_id = get_apod_id_from_db(image_sha256)
+        if image_id !=0:
+            file_path = determine_apod_file_path(apod_info_dict['title'], apod_info_dict['thumbnail_url'])
         try:
             with open(file_path, 'wb') as file:
-                file.write(image_data)
-        except ValueError as error:
+                file.write(image_bytes)
+        except Exception as error:
             print(error)
-            
             add_apod_to_db(apod_info_dict['title'], apod_info_dict['explanation'], file_path, image_sha256)
-        pass
+        else:
+            exit()
 
     if apod_info_dict['media_type'] == 'image':
         print('APOD title:', apod_info_dict['title'])
         print('APOD URL:', apod_info_dict['hdurl'])
         print('Downloading image from', apod_info_dict['hdurl'] )
-        image_data = resp_msg.content
-        image_sha256 = hashlib.sha256(image_data).hexdigest()    
-        #image_id = get_apod_id_from_db(image_sha256)
-        #file_path = determine_apod_file_path(apod_info_dict['title'], apod_info_dict['hdurl'])
-        file_path = r'C:\temp'
-        try:
+        image_bytes_resp = requests.get(apod_info_dict['hdurl'])
+        image_bytes = image_bytes_resp.content
+        image_sha256 = hashlib.sha256(image_bytes).hexdigest()    
+        image_id = get_apod_id_from_db(image_sha256)
+        if image_id != 0:
+            # TODO Fix this shit
+            file_path = determine_apod_file_path(apod_info_dict['title'], apod_info_dict['hdurl'])
             with open(file_path, 'wb') as file:
-                file.write(image_data)
-        except Exception as error:
-            print(error)
-        add_apod_to_db(apod_info_dict['title'], apod_info_dict['explanation'], file_path, image_sha256)
+                file.write(image_bytes)
+            add_apod_to_db(apod_info_dict['title'], apod_info_dict['explanation'], file_path, image_sha256)
+            return image_id
+        else:
+            return 0
+    
          
         
     # TODO: Check whether the APOD already exists in the image cache
@@ -236,31 +241,32 @@ def add_apod_to_db(title, explanation, file_path, sha256):
     Returns:
         int: The ID of the newly inserted APOD record, if successful.  Zero, if unsuccessful       
     """
-    try:
+    
         # TODO: Complete function body
-        con = sqlite3.connect(image_cache_db)
-        cur = con.cursor()
+    con = sqlite3.connect(image_cache_db)
+    cur = con.cursor()
 
-        add_image_query = """
+    add_image_query = """
         INSERT INTO images
                 (
                 title,
-                explanation
-                path
+                explanation,
+                path,
                 sha_256)
                 VALUES (?,?,?,?);
                 """
-        new_image = (
+    new_image = (
             title,
             explanation,
             file_path,
             sha256)
-        cur.execute(add_image_query, new_image)
-        con.commit()
-        con.close()
-        return cur.lastrowid
-    except:
-        return 0
+    cur.execute(add_image_query, new_image)
+    con.commit()
+    con.close()
+    return cur.lastrowid
+    
+
+    return 0
 
 def get_apod_id_from_db(image_sha256):
     """Gets the record ID of the APOD in the cache having a specified SHA-256 hash value
@@ -276,14 +282,18 @@ def get_apod_id_from_db(image_sha256):
     # TODO: Complete function body
     con = sqlite3.connect(image_cache_db)
     cur = con.cursor()
+    # Define query to seach for album in DB
     find_image_query = """
     SELECT ID FROM images
     WHERE sha_256 = ? """
-    cur.execute(find_image_query)
+    #image_data = tuple(image_sha256,)
+    cur.execute(find_image_query, [image_sha256])
+
     query_result = cur.fetchone()
     con.close
     if query_result is not None:
-        return query_result
+        return query_result[0]
+    pass
     
     return 0
 
@@ -319,7 +329,7 @@ def determine_apod_file_path(image_title, image_url):
     # Cleanup title - remove non word chars, leading and trailing whitespaces, inner spaces replaced with underscores.
     cleaned_string = re.sub('\W', '', re.sub('\s', '_', image_title.strip()))
     #file_path = image_cache_dir + cleaned_string + file_extension
-    file_path = os.path.join(image_cache_dir, cleaned_string + '.jpg')   
+    file_path = os.path.join(image_cache_dir, cleaned_string + file_extension)   
     return file_path
 
 def get_apod_info(image_id):
