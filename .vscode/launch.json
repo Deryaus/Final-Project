@@ -5,13 +5,23 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "APOD_desktop - no date",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
             "name": "apod_desktop Wrong date format",
             "type": "python",
             "request": "launch",
             "program": "apod_desktop.py",
             "console": "integratedTerminal",
             "justMyCode": true,
-            "args": ["Jan 19th, 2022"]
+            "args": [
+                "Jan 19th, 2022"
+            ]
         },
         {
             "name": "apod_desktop Video-File",
@@ -48,7 +58,7 @@
             "console": "integratedTerminal",
             "justMyCode": true,
             "args": [
-                "2021-05-03"
+                "2022-05-03"
             ]
         }
     ]

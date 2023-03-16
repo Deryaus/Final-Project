@@ -11,7 +11,7 @@ import os, ctypes, random, string, struct
 def main():
     
     # apod_date = "2021-08-25" # Video File.
-    apod_date = '2014-05-03'
+    apod_date = '2021-05-03'
     apod_info_dict = get_apod_info(apod_date)
     image_url = get_apod_image_url(apod_info_dict)
     image_data = download_image(image_url)
