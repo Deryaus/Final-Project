@@ -381,7 +381,7 @@ def get_apod_info(image_id):
         }
         return apod_info
     except Exception as error:
-        print(f'error\nScript aborted.')
+        print(f'{error}\nScript aborted.')
 
 def get_all_apod_titles():
     """Gets a list of the titles of all APODs in the image cache
