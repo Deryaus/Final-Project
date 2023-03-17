@@ -11,11 +11,13 @@ import os, ctypes, random, string, struct
 def main():
     
     # apod_date = "2021-08-25" # Video File.
-    apod_date = '2017-05-03'
+    apod_date = '2017-09-03'
     apod_info_dict = get_apod_info(apod_date)
     image_url = get_apod_image_url(apod_info_dict)
     image_data = download_image(image_url)
-    image_path = save_image_file(image_data, r"C:\temp\images")
+    file_name = ''.join(random.choice(string.ascii_letters) for i in range(12)) + ".jpg"
+    image_path = os.path.join(r'C:\temp\images', file_name)
+    save_image_file(image_data, image_path)
     set_desktop_background_image(image_path)
 
 def download_image(image_url):
@@ -29,16 +31,18 @@ def download_image(image_url):
     Returns:
         Bytes: Binary image data, if succcessful. None, if unsuccessful.
     """
+
+    print('Downloading image from:', image_url, end='')
     # Send GET request to download file
     resp_msg = requests.get(image_url)
     # Check whether the download was successfull
-    if resp_msg.status_code == requests.codes.ok:
+    if resp_msg.ok:
+        print('...success!')
         # Extract Binary file content from response message body.
         image_data = resp_msg.content
         return image_data
     else:
-        print(f'Failed to download file \n {resp_msg.status_code} {resp_msg.reason}')
-        exit()
+        print(f'...failure.\n{resp_msg.status_code} {resp_msg.reason}')
 
 def save_image_file(image_data, image_path,):
     """Saves image data as a file on disk.
@@ -52,20 +56,16 @@ def save_image_file(image_data, image_path,):
     Returns:
         Bool: True, if succcessful. False, if unsuccessful
     """
-    # Set Directory and file path
-    file_name = string.ascii_letters
-    file_path = ''.join(random.choice(file_name) for i in range(12)) + ".jpg"
-    installer_path = os.path.join(image_path, file_path)
-    # write binary Data as JPEG
+    print(f'Saving image file as {image_path}', end='')
+    # write binary data to image_path
     try:
-        if not os.path.isdir(image_path):
-            os.makedirs(image_path)
-        with open(installer_path, 'wb') as file:
+        with open(image_path, 'wb') as file:
             file.write(image_data)
-            return  installer_path
+            print('...success!')
+            return  True
     except Exception as error:
-        print(error)
-        exit()
+        print(f'...failure {error}')
+        return False
     
 
 def set_desktop_background_image(image_path):
@@ -89,7 +89,8 @@ def set_desktop_background_image(image_path):
             return True
     except Exception as error:
         print(f'...failure \n{error}')
-        exit()
+        return False
+        
 
 def scale_image(image_size, max_size=(800, 600)):
     """Calculates the dimensions of an image scaled to a maximum width

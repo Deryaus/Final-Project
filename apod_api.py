@@ -26,14 +26,18 @@ def get_apod_info(apod_date):
                            'date': apod_date,
                            'thumbs': 'True'}
     # send Get request to APOD api.
+    print("APOD date:", apod_date)
+    print(f'Getting {apod_date} APOD information from NASA', end=' ')
     resp_msg = requests.get(URL, params=query_string_params)
     # Check if GET request was successfull.
-    if resp_msg:
+
+    if resp_msg.ok:
         apod_info_dict = resp_msg.json()
+        print('...success!')
+        print('APOD title:', apod_info_dict['title'])
         return apod_info_dict
     else:
-        print(f'Failure... {resp_msg.status_code} {resp_msg.reason}.')
-        exit()
+        print(f'failure... {resp_msg.status_code} {resp_msg.reason}.')
 
 def get_apod_image_url(apod_info_dict):
     """Gets the URL of the APOD image from the dictionary of APOD information.

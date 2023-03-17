@@ -14,10 +14,7 @@ Parameters:
 --------------------ι𝐍Ⓙย𝐬𝓣ᶤςⒺ Ⓐ𝐍ＹωᕼⒺг𝐄 ᶤ𝐬 ᵃ tｈяᗴＡт ⓉＯ 𝐣υ𝔰ｔ𝐢ᶜⓔ 𝐄V乇яｙ山卄εŘ乇 --------------------"""
 from datetime import date
 from sys import argv, exit
-import os, re, image_lib, inspect, requests,hashlib, sqlite3
-
-global image_cache_db
-global image_cache_dir
+import os, re, image_lib, inspect,hashlib, sqlite3, apod_api
 
 def main():
     ## DO NOT CHANGE THIS FUNCTION ##
@@ -32,6 +29,8 @@ def main():
 
     # Add the APOD for the specified date to the cache
     apod_id = add_apod_to_cache(apod_date)
+    if apod_id == 0:
+        exit()
 
     # Get the information for the APOD from the DB
     apod_info = get_apod_info(apod_id)
@@ -97,6 +96,7 @@ def init_apod_cache(parent_dir):
     """
     # Determine the path of the image cache directory
     global image_cache_dir
+    global image_cache_db
     try:
         image_cache_dir = os.path.join(parent_dir,'images')
         print(f'Image cache directory: {image_cache_dir}')
@@ -106,7 +106,6 @@ def init_apod_cache(parent_dir):
         if not os.path.isdir(image_cache_dir):
             os.makedirs(image_cache_dir)
             print('Image cache directory created.')    
-        global image_cache_db
         image_cache_db = os.path.join(image_cache_dir, 'image_cache.db')
         print(f'Image cache DB: {image_cache_db}')
         if os.path.exists(image_cache_db) == True:
@@ -131,7 +130,7 @@ def init_apod_cache(parent_dir):
             con.commit()
             print(f'Image cache DB created.')
     except Exception as error:
-        print(f'{error}\nScript aborted.')
+        print(error)
     
    
 def add_apod_to_cache(apod_date):
@@ -148,110 +147,36 @@ def add_apod_to_cache(apod_date):
         int: Record ID of the APOD in the image cache DB, if a new APOD is added to the
         cache successfully or if the APOD already exists in the cache. Zero, if unsuccessful.
     """
-    print("APOD date:", apod_date.isoformat())
-    print(f'Getting {apod_date.isoformat()} APOD information from NASA', end=' ')
-    # Download the APOD information from the NASA API
-    URL = 'https://api.nasa.gov/planetary/apod'
-    API_KEY ='9B5p6pJIrJQsag5XemQBqiDzteN66d8sVlqdoZGC'
-    # setup query string parameters.
-    query_string_params = {'api_key': API_KEY,
-                            'date': apod_date,
-                            'thumbs': 'True'}
-    # Send Get request to APOD api.
-    resp_msg = requests.get(URL, params=query_string_params)
-    # Check if GET request was successfull.
-    if resp_msg.ok:
-        apod_info_dict = resp_msg.json()
+    # Download the APOD information from the NASA API.
+    apod_info_dict = apod_api.get_apod_info(apod_date)
+    # Get the image URL.
+    image_url = apod_api.get_apod_image_url(apod_info_dict)
+    if image_url == '':
+        print('APOD has no image URL')
+        return 0
+    print('APOD URL:', image_url)
+    # Download image.
+    apod_image_data = image_lib.download_image(image_url)
+    if apod_image_data is None:
+        return 0
+    # Get the SHA-256 value from response message content.
+    image_sha256 = hashlib.sha256(apod_image_data).hexdigest()
+    print(f'APOD SHA-256: {image_sha256}')
+    # Determine if image is already in the Database.
+    image_id = get_apod_id_from_db(image_sha256)
+    if image_id !=0:
+            print("APOD image is already in cache.")
+            return image_id
+    # if image is not in the Database save image and add to database.
+    elif image_id == 0:
+        print('APOD image is not already in cache.')
+        file_path = determine_apod_file_path(apod_info_dict['title'], image_url)
+        image_lib.save_image_file(apod_image_data, file_path)
+        print('Adding APOD to image cache DB', end='')
+        image_id = add_apod_to_db(apod_info_dict['title'], apod_info_dict['explanation'], file_path, image_sha256)
         print('...success!')
-    else:
-        resp_msg.status_code != requests.codes.ok
-        print(f'...failure.\n{resp_msg.status_code} {resp_msg.reason}\nScript Aborted')
-        exit()
-    try:  
-        if apod_info_dict['media_type'] == 'video':
-            print('APOD title:', apod_info_dict['title'])
-            print('APOD URL: ', apod_info_dict['thumbnail_url'])
-            print('Downloading image from:', apod_info_dict['thumbnail_url'], end='' )
-            # Send GET request to download image. 
-            image_bytes_resp = requests.get(apod_info_dict['thumbnail_url'])
-            # Check if response message was successful.
-            if image_bytes_resp.ok:
-                print('...sucess!')
-                image_bytes = image_bytes_resp.content
-                image_sha256 = hashlib.sha256(image_bytes).hexdigest()
-                print(f'APOD SHA-256: {image_sha256}')
-                image_id = get_apod_id_from_db(image_sha256)
-            elif image_bytes_resp.status_code != requests.codes.ok:
-                print(f'... failure.\n{image_bytes_resp.status_code} {image_bytes_resp.reason}\nScript Aborted ')
-                exit()
-            if image_id !=0:
-                print("APOD image is already in cache.")
-                return image_id
-            elif image_id == 0:
-                    print('APOD image is not already in cache.')
-                    try:
-                        file_path = determine_apod_file_path(apod_info_dict['title'], apod_info_dict['thumbnail_url'])
-                        print(f'Saving image file as {file_path}', end='')
-                        with open(file_path, 'wb') as file:
-                            file.write(image_bytes)
-                        print('...sucess!')
-                    except Exception as error:
-                        print(f'...failure.\n{error}')
-                        exit()
-                    try:
-                        print('Adding APOD to image cache DB', end='')
-                        image_id = add_apod_to_db(apod_info_dict['title'], apod_info_dict['explanation'], file_path, image_sha256)
-                        print('...success!')
-                        return image_id
-                    except Exception as error:
-                        print(f'...failure.\n{error}')
-                        return 0
-    except Exception as error:
-        print(f'{error}\nScript aborted.')
-        exit()
-    try:
-        if apod_info_dict['media_type'] == 'image':
-            print('APOD title:', apod_info_dict['title'])
-            print('APOD URL:', apod_info_dict['hdurl'])
-            print('Downloading image from:', apod_info_dict['hdurl'], end='')
-            # Send get request to download image. 
-            image_bytes_resp = requests.get(apod_info_dict['hdurl'])
-            # Check if response message was successful.
-            if image_bytes_resp.ok:
-                print('...success!')
-                image_bytes = image_bytes_resp.content
-                image_sha256 = hashlib.sha256(image_bytes).hexdigest()
-                print(f'APOD SHA-256: {image_sha256}')
-                image_id = get_apod_id_from_db(image_sha256)
-            elif image_bytes_resp.status_code != requests.codes.ok:
-                print(f'... failure.\n{image_bytes_resp.status_code} {image_bytes_resp.reason}\nScript Aborted ')
-                exit()
-            if image_id != 0:
-                    print("APOD image is already in cache.")
-                    return image_id
-            elif image_id == 0:
-                print('APOD image is not already in cache.')
-                try:
-                    file_path = determine_apod_file_path(apod_info_dict['title'], apod_info_dict['hdurl'])
-                    print(f'Saving image file as {file_path}', end='')
-                    with open(file_path, 'wb') as file:
-                        file.write(image_bytes)
-                        print('...success!')
-                except Exception as error:
-                    print(f'...failure.\n{error}\nScript Aborted')
-                    exit()
-                try:
-                    print('Adding APOD to image cache DB', end='')
-                    image_id = add_apod_to_db(apod_info_dict['title'], apod_info_dict['explanation'], file_path, image_sha256)
-                    print('...success!')
-                    return image_id
-                except Exception as error:
-                    print(f'...failure.\n{error}.')
-                    return 0
-    except Exception as error:
-        print(f'{error}\nScript aborted.')
-        exit()
-
+        return image_id
+    
 def add_apod_to_db(title, explanation, file_path, sha256):
     """Adds specified APOD information to the image cache DB.
      
@@ -264,7 +189,6 @@ def add_apod_to_db(title, explanation, file_path, sha256):
     Returns:
         int: The ID of the newly inserted APOD record, if successful.  Zero, if unsuccessful       
     """
-    
     try:
         con = sqlite3.connect(image_cache_db)
         cur = con.cursor()
@@ -291,7 +215,6 @@ def add_apod_to_db(title, explanation, file_path, sha256):
         print(error)
         return 0
     
-
 def get_apod_id_from_db(image_sha256):
     """Gets the record ID of the APOD in the cache having a specified SHA-256 hash value
     
@@ -303,21 +226,18 @@ def get_apod_id_from_db(image_sha256):
     Returns:
         int: Record ID of the APOD in the image cache DB, if it exists. Zero, if it does not.
     """
-    try:
-        con = sqlite3.connect(image_cache_db)
-        cur = con.cursor()
-        # Define query to seach for album in DB
-        find_image_query = """
-        SELECT ID FROM images
-        WHERE sha_256 = ? """
-        cur.execute(find_image_query, [image_sha256])
-        query_result = cur.fetchone()
-        con.close
-        if query_result is not None:
-            return query_result[0]
-        return 0
-    except Exception as error:
-        print(f'{error}\nScript aborted.')
+    con = sqlite3.connect(image_cache_db)
+    cur = con.cursor()
+    # Define query to seach for album in DB
+    find_image_query = """
+    SELECT ID FROM images
+     WHERE sha_256 = ? """
+    cur.execute(find_image_query, [image_sha256])
+    query_result = cur.fetchone()
+    con.close
+    if query_result is not None:
+        return query_result[0]
+    return 0
 
 def determine_apod_file_path(image_title, image_url):
     """Determines the path at which a newly downloaded APOD image must be 
@@ -381,7 +301,7 @@ def get_apod_info(image_id):
         }
         return apod_info
     except Exception as error:
-        print(f'{error}\nScript aborted.')
+        print(f'{error}.')
 
 def get_all_apod_titles():
     """Gets a list of the titles of all APODs in the image cache
@@ -399,7 +319,7 @@ def get_all_apod_titles():
         con.close()
         return query_result
     except Exception as error:
-        print(f'{error}\nScript aborted.')
+        print(f'{error}')
 
 if __name__ == '__main__':
     main()
