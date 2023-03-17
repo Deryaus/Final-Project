@@ -63,11 +63,9 @@ def get_apod_date():
         if apod_date < START_DATE:
             print(f'Error: No data before {START_DATE}\nScript Aborted.')
             exit()
-       
         elif apod_date > date.today():
             print('Error: APOD date cannot be in the future\nScript Aborted.')
             exit()
-       
     else:
         apod_date = date.today()
     return apod_date
@@ -94,7 +92,7 @@ def init_apod_cache(parent_dir):
     Args:
         parent_dir (str): Full path of parent directory    
     """
-    # Determine the path of the image cache directory
+    # Determine the path of the image cache directory.
     global image_cache_dir
     global image_cache_db
     try:
@@ -228,7 +226,7 @@ def get_apod_id_from_db(image_sha256):
     """
     con = sqlite3.connect(image_cache_db)
     cur = con.cursor()
-    # Define query to seach for album in DB
+    # Define query to seach for image in DB
     find_image_query = """
     SELECT ID FROM images
      WHERE sha_256 = ? """
@@ -301,7 +299,7 @@ def get_apod_info(image_id):
         }
         return apod_info
     except Exception as error:
-        print(f'{error}.')
+        print(error)
 
 def get_all_apod_titles():
     """Gets a list of the titles of all APODs in the image cache
@@ -319,7 +317,7 @@ def get_all_apod_titles():
         con.close()
         return query_result
     except Exception as error:
-        print(f'{error}')
+        print(error)
 
 if __name__ == '__main__':
     main()
