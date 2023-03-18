@@ -14,7 +14,7 @@ Parameters:
 --------------------ι𝐍Ⓙย𝐬𝓣ᶤςⒺ Ⓐ𝐍ＹωᕼⒺг𝐄 ᶤ𝐬 ᵃ tｈяᗴＡт ⓉＯ 𝐣υ𝔰ｔ𝐢ᶜⓔ 𝐄V乇яｙ山卄εŘ乇 --------------------"""
 from datetime import date
 from sys import argv, exit
-import os, re, image_lib, inspect,hashlib, sqlite3, apod_api
+import os, re, image_lib, inspect, hashlib, sqlite3, apod_api
 
 def main():
     ## DO NOT CHANGE THIS FUNCTION ##
@@ -120,7 +120,8 @@ def init_apod_cache(parent_dir):
                 title       TEXT NOT NULL,   
                 explanation TEXT NOT NULL,
                 path        TEXT NOT NULL,
-                sha_256     TEXT NOT NULL
+                sha_256     TEXT NOT NULL,
+                apod_date   TEXT NOT NULL
                 );"""
             # Execute SQL database to create the 'images' table
             cur.execute(create_image_table_query)
@@ -171,11 +172,11 @@ def add_apod_to_cache(apod_date):
         file_path = determine_apod_file_path(apod_info_dict['title'], image_url)
         image_lib.save_image_file(apod_image_data, file_path)
         print('Adding APOD to image cache DB', end='')
-        image_id = add_apod_to_db(apod_info_dict['title'], apod_info_dict['explanation'], file_path, image_sha256)
+        image_id = add_apod_to_db(apod_info_dict['title'], apod_info_dict['explanation'], file_path, image_sha256, apod_date)
         print('...success!')
         return image_id
     
-def add_apod_to_db(title, explanation, file_path, sha256):
+def add_apod_to_db(title, explanation, file_path, sha256, apod_date):
     """Adds specified APOD information to the image cache DB.
      
     Args:
@@ -183,6 +184,7 @@ def add_apod_to_db(title, explanation, file_path, sha256):
         explanation (str): Explanation of the APOD image
         file_path (str): Full path of the APOD image file
         sha256 (str): SHA-256 hash value of APOD image
+        apod_date (date): APOD date (Can also be a string formatted as YYYY-MM-DD)
 
     Returns:
         int: The ID of the newly inserted APOD record, if successful.  Zero, if unsuccessful       
@@ -197,14 +199,16 @@ def add_apod_to_db(title, explanation, file_path, sha256):
                     title,
                     explanation,
                     path,
-                    sha_256)
-                    VALUES (?,?,?,?);
+                    sha_256,
+                    apod_date)
+                    VALUES (?,?,?,?,?);
                     """
         new_image = (
                 title,
                 explanation,
                 file_path,
-                sha256)
+                sha256,
+                apod_date)
         cur.execute(add_image_query, new_image)
         con.commit()
         con.close()

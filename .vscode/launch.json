@@ -40,8 +40,8 @@
             "justMyCode": true,
             "args": [
                 //"2021-08-25",
-                "2022-05-09",
-                //"2018-08-08" // This one is fucked
+                //"2022-05-09",
+                "2018-08-08" // This one is fucked
             ]
         },
         {
@@ -68,7 +68,7 @@
             "console": "integratedTerminal",
             "justMyCode": true,
             "args": [
-                //"2022-05-03"
+                "2022-05-03"
                 //"2021-05-06"
                 //"2019-05-03"
                 //"1997-05-03"
