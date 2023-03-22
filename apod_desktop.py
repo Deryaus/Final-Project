@@ -56,16 +56,17 @@ def get_apod_date():
         try:
             apod_date = date.fromisoformat(argv[1])
         except ValueError as error:
-            print(f'Error: Invalid date format: {error}\nScript Aborted.')
-            exit()
+            print(f'Error: Invalid date format: {error}.')
+            exit('Script Aborted.')
     # Validate date falls within accepted range
         START_DATE = date.fromisoformat('1995-06-16')
         if apod_date < START_DATE:
-            print(f'Error: No data before {START_DATE}\nScript Aborted.')
-            exit()
-        elif apod_date > date.today():
-            print('Error: APOD date cannot be in the future\nScript Aborted.')
-            exit()
+            print(f'Error: No data before {START_DATE}')
+            exit('Script Aborted.')
+        else:
+            apod_date > date.today()
+            print('Error: APOD date cannot be in the future.')
+            exit('Script Aborted')
     else:
         apod_date = date.today()
     return apod_date
@@ -101,14 +102,16 @@ def init_apod_cache(parent_dir):
         # check to see if directory exists
         if os.path.exists(image_cache_dir) == True:
             print('Image cache directory already exists.')
-        if not os.path.isdir(image_cache_dir):
+        else:
+            not os.path.isdir(image_cache_dir)
             os.makedirs(image_cache_dir)
             print('Image cache directory created.')    
         image_cache_db = os.path.join(image_cache_dir, 'image_cache.db')
         print(f'Image cache DB: {image_cache_db}')
         if os.path.exists(image_cache_db) == True:
             print('Image cache DB already exists.')
-        if not os.path.exists(image_cache_db):
+        else:
+            not os.path.exists(image_cache_db)
             # Open a connection to the database
             con = sqlite3.connect(image_cache_db)
             # Get a cursor object that can be used to run SQL queries on the database.
@@ -154,7 +157,7 @@ def add_apod_to_cache(apod_date):
         print('APOD has no image URL')
         return 0
     print('APOD URL:', image_url)
-    # Download image.
+    # Download APOD image.
     apod_image_data = image_lib.download_image(image_url)
     if apod_image_data is None:
         return 0
@@ -167,13 +170,12 @@ def add_apod_to_cache(apod_date):
             print("APOD image is already in cache.")
             return image_id
     # if image is not in the Database save image and add to database.
-    elif image_id == 0:
+    else:
+        image_id == 0
         print('APOD image is not already in cache.')
         file_path = determine_apod_file_path(apod_info_dict['title'], image_url)
         image_lib.save_image_file(apod_image_data, file_path)
-        print('Adding APOD to image cache DB', end='')
         image_id = add_apod_to_db(apod_info_dict['title'], apod_info_dict['explanation'], file_path, image_sha256, apod_date)
-        print('...success!')
         return image_id
     
 def add_apod_to_db(title, explanation, file_path, sha256, apod_date):
@@ -190,9 +192,9 @@ def add_apod_to_db(title, explanation, file_path, sha256, apod_date):
         int: The ID of the newly inserted APOD record, if successful.  Zero, if unsuccessful       
     """
     try:
+        print('Adding APOD to image cache DB', end='')
         con = sqlite3.connect(image_cache_db)
         cur = con.cursor()
-
         add_image_query = """
             INSERT INTO images
                     (
@@ -212,9 +214,10 @@ def add_apod_to_db(title, explanation, file_path, sha256, apod_date):
         cur.execute(add_image_query, new_image)
         con.commit()
         con.close()
+        print('...success!')
         return cur.lastrowid
     except Exception as error:
-        print(error)
+        print(f'...failure\n{error}')
         return 0
     
 def get_apod_id_from_db(image_sha256):
@@ -230,7 +233,7 @@ def get_apod_id_from_db(image_sha256):
     """
     con = sqlite3.connect(image_cache_db)
     cur = con.cursor()
-    # Define query to seach for image in DB
+    # Define query to seach for image in DB.
     find_image_query = """
     SELECT ID FROM images
      WHERE sha_256 = ? """
@@ -285,17 +288,17 @@ def get_apod_info(image_id):
         dict: Dictionary of APOD information
     """
     try:
-        # Open connection to DB
+        # Open connection to DB.
         con = sqlite3.connect(image_cache_db)
         cur = con.cursor()
-        # Define query to seach for image in DB
+        # Define query to seach for image in DB.
         find_image_query = """
             SELECT * FROM images
             WHERE ID = ? """
         cur.execute(find_image_query, [image_id])
         query_result = cur.fetchone()
         con.close
-        # Put information into a dictionary
+        # Put information into a dictionary.
         apod_info = {
             'title': query_result[1], 
             'explanation': query_result[2],
@@ -312,7 +315,7 @@ def get_all_apod_titles():
         list: Titles of all images in the cache
     """
     try:
-        # Open connection to DB
+        # Open connection to DB.
         con = sqlite3.connect(image_cache_db)
         cur = con.cursor()
         # Execute query.

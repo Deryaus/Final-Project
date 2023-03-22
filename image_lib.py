@@ -57,14 +57,14 @@ def save_image_file(image_data, image_path,):
         Bool: True, if succcessful. False, if unsuccessful
     """
     print(f'Saving image file as {image_path}', end='')
-    # write binary data to image_path
+    # write binary data to image_path.
     try:
         with open(image_path, 'wb') as file:
             file.write(image_data)
             print('...success!')
             return  True
     except Exception as error:
-        print(f'...failure {error}')
+        print(f'...failure\n{error}')
         return False
     
 
@@ -88,7 +88,7 @@ def set_desktop_background_image(image_path):
             print('...success!')
             return True
     except Exception as error:
-        print(f'...failure \n{error}')
+        print(f'...failure\n{error}')
         return False
         
 
