@@ -63,8 +63,7 @@ def get_apod_date():
         if apod_date < START_DATE:
             print(f'Error: No data before {START_DATE}')
             exit('Script Aborted.')
-        else:
-            apod_date > date.today()
+        if apod_date > date.today():
             print('Error: APOD date cannot be in the future.')
             exit('Script Aborted')
     else:
@@ -154,7 +153,7 @@ def add_apod_to_cache(apod_date):
     # Get the image URL.
     image_url = apod_api.get_apod_image_url(apod_info_dict)
     if image_url == '':
-        print('APOD has no image URL')
+        print('APOD has no image URL. Please try a different date.')
         return 0
     print('APOD URL:', image_url)
     # Download APOD image.
