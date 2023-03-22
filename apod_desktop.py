@@ -98,7 +98,7 @@ def init_apod_cache(parent_dir):
     try:
         image_cache_dir = os.path.join(parent_dir,'images')
         print(f'Image cache directory: {image_cache_dir}')
-        # check to see if directory exists
+        # check to see if directory exists.
         if os.path.exists(image_cache_dir) == True:
             print('Image cache directory already exists.')
         else:
@@ -107,11 +107,12 @@ def init_apod_cache(parent_dir):
             print('Image cache directory created.')    
         image_cache_db = os.path.join(image_cache_dir, 'image_cache.db')
         print(f'Image cache DB: {image_cache_db}')
+        # Check to see if DB exists.
         if os.path.exists(image_cache_db) == True:
             print('Image cache DB already exists.')
         else:
             not os.path.exists(image_cache_db)
-            # Open a connection to the database
+            # Open a connection to the database.
             con = sqlite3.connect(image_cache_db)
             # Get a cursor object that can be used to run SQL queries on the database.
             cur = con.cursor()
@@ -125,9 +126,9 @@ def init_apod_cache(parent_dir):
                 sha_256     TEXT NOT NULL,
                 apod_date   TEXT NOT NULL
                 );"""
-            # Execute SQL database to create the 'images' table
+            # Execute SQL database to create the 'images' table.
             cur.execute(create_image_table_query)
-            # Commit to the database
+            # Commit to the database.
             con.commit()
             print(f'Image cache DB created.')
     except Exception as error:
@@ -292,16 +293,17 @@ def get_apod_info(image_id):
         cur = con.cursor()
         # Define query to seach for image in DB.
         find_image_query = """
-            SELECT * FROM images
+            SELECT title, explanation, path  FROM images
             WHERE ID = ? """
         cur.execute(find_image_query, [image_id])
-        query_result = cur.fetchone()
+        #query_result = cur.fetchone()
+        title, explanation, path = cur.fetchone()
         con.close
         # Put information into a dictionary.
         apod_info = {
-            'title': query_result[1], 
-            'explanation': query_result[2],
-            'file_path': query_result[3],
+            'title': title, 
+            'explanation': explanation,
+            'file_path': path,
         }
         return apod_info
     except Exception as error:

@@ -33,9 +33,9 @@ def download_image(image_url):
     """
 
     print('Downloading image from:', image_url, end='')
-    # Send GET request to download file
+    # Send GET request to download file.
     resp_msg = requests.get(image_url)
-    # Check whether the download was successfull
+    # Check whether the download was successfull.
     if resp_msg.ok:
         print('...success!')
         # Extract Binary file content from response message body.

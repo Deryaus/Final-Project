@@ -23,9 +23,9 @@ apod_desktop.init_apod_cache(script_dir)
 # TODO: Create the GUI
 root = Tk()
 root.geometry('600x400')
+root.iconbitmap(r'C:\temp\favicon.ico')
 
 root.title('Astronomy Picture Of The Day')
-root.iconbitmap(r'C:\temp\favicon.ico')
 bckgrd_image = Image.open(r'C:\temp\images\19.jpg')
 bckgrd_image = bckgrd_image.resize((root.winfo_screenwidth(), root.winfo_screenheight()))
 bphoto = ImageTk.PhotoImage(bckgrd_image)
