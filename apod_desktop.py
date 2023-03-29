@@ -296,7 +296,6 @@ def get_apod_info(image_id):
             SELECT title, explanation, path  FROM images
             WHERE ID = ? """
         cur.execute(find_image_query, [image_id])
-        #query_result = cur.fetchone()
         title, explanation, path = cur.fetchone()
         con.close
         # Put information into a dictionary.
