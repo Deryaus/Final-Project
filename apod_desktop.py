@@ -17,6 +17,7 @@ from sys import argv, exit
 import os, re, image_lib, inspect, hashlib, sqlite3, apod_api
 
 def main():
+    
     ## DO NOT CHANGE THIS FUNCTION ##
     # Get the APOD date from the command line
     apod_date = get_apod_date()    
@@ -319,10 +320,10 @@ def get_all_apod_titles():
         con = sqlite3.connect(image_cache_db)
         cur = con.cursor()
         # Execute query.
-        cur.execute("SELECT title FROM images") 
-        query_result = cur.fetchall()
+        cur.execute("SELECT title FROM images")
+        titles = [t[0] for t in cur]
         con.close()
-        return query_result
+        return titles
     except Exception as error:
         print(error)
 
