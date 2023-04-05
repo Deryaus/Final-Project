@@ -95,7 +95,7 @@ def title_sel(event):
 cbox_title_sel.bind("<<ComboboxSelected>>", title_sel)
 
 
-# Creat Download Image Event handle
+# Create Download Image Event handle
 #TODO finish button handling
 def download_image():
     apod_date = cal.get()
@@ -103,7 +103,8 @@ def download_image():
     apod_info = apod_desktop.get_apod_info(apod_id)
     # Populate middle frame with explanation
     lbl_desc['text'] = apod_info['explanation']
-    
+    cbox_title_sel.set(apod_info['title'])
+    #btn_set_dsktp.config(state=NORMAL)
 
 
 # Add Widgets to the bottom right frame
