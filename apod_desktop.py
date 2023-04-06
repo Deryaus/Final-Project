@@ -331,7 +331,7 @@ def get_apod_path_and_expl(apod_title):
     title from the DB.
 
     Args:
-        image_id (int): ID of APOD in the DB
+        apod_title (str): Title of APOD in the DB
 
     Returns:
         dict: Dictionary of APOD information

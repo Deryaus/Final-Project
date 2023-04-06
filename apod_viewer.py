@@ -66,9 +66,8 @@ btm_right_frm.columnconfigure(1, weight=1)
 btm_right_frm.rowconfigure(2, weight=1)
 
 # Default Image Upon opening GUI
-global nasa_logo
 bckgrd_image = Image.open(os.path.join(script_dir,"NASA_logo.png")).resize((600,400))
-nasa_logo = ImageTk.PhotoImage(bckgrd_image)
+nasa_logo = ImageTk.PhotoImage(bckgrd_image, Image.ANTIALIAS)
 lbl_image = ttk.Label(top_frm, image=nasa_logo, anchor=CENTER)
 lbl_image.grid(row=0, column=0, columnspan=2, padx=(10,10), pady=10,)
 
@@ -77,6 +76,7 @@ lbl_cache = ttk.Label(btm_left_frm, text='Select an Image:')
 lbl_cache.grid(row=0, column=0, padx=5, pady=10, sticky=W)
 
 # Get list of titles from DB and pass to combobox
+global cache_list
 cache_list = sorted(apod_desktop.get_all_apod_titles())
 cbox_title_sel = ttk.Combobox(btm_left_frm, width=40, values=cache_list, state='readonly')
 cbox_title_sel.set('Select An Image')
@@ -92,13 +92,13 @@ btn_set_dsktp = ttk.Button(btm_left_frm, text='Set As Desktop', command=handle_s
 btn_set_dsktp.grid(row=0, column=3, padx=5, pady=10, sticky=W)
 
 # Add Widget to middle frame
-lbl_desc = ttk.Label(middle_frm, text='', anchor=CENTER, wraplength=750)
+lbl_desc = ttk.Label(middle_frm, text='Discover the cosmos! Each day a different image or photograph of our fascinating universe is \
+featured, along with a brief explanation written by a professional astronomer.', anchor=CENTER, wraplength=750)
 lbl_desc.grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky=NSEW)
 
 # Handle title selection event
 def title_sel(event):
     # Change min size of window
-    global nasa_logo
     root.minsize(800,900)
     # Enable set as desktop button upon selection
     if cbox_title_sel.current() != -1:
@@ -112,12 +112,11 @@ def title_sel(event):
     image_size = new_image.size
     # Scale the image to an appropriate size
     width, height = image_lib.scale_image(image_size)
-    resized_img = new_image.resize((width, height))
+    resized_img = new_image.resize((width, height), Image.ANTIALIAS)
     new_tk_image = ImageTk.PhotoImage(resized_img)
     # Display new image in window
     lbl_image['image'] = new_tk_image
     lbl_image.image 
-    
     
 # Bind title select to combobox
 cbox_title_sel.bind("<<ComboboxSelected>>", title_sel)
@@ -135,26 +134,29 @@ def download_image():
     apod_info = apod_desktop.get_apod_info(apod_id)
     if apod_info is None:
         err_msg = 'Unable to retrieve data for this date'
-        messagebox.showinfo(title='Error', message=err_msg, icon='error')
-        
+        messagebox.showinfo(title='Error', message=err_msg, icon='error')  
     else:
-        # Populate middle frame with explanation
+        # Populate frames with new information
         lbl_desc['text'] = apod_info['explanation']
         cbox_title_sel.set(apod_info['title'])
+        # Add new title to combobox
+        new_title = cbox_title_sel.get()
+        if new_title not in cbox_title_sel['values']:
+            cache_list.append(new_title)
+            cbox_title_sel['values'] = sorted(cache_list)
         # Open new Image
         new_image = Image.open(apod_info['file_path'])   
         # Find out the Image Size
         image_size = new_image.size
         # Scale the image to an appropriate size
         width, height = image_lib.scale_image(image_size)
-        resized_img = new_image.resize((width, height))
+        resized_img = new_image.resize((width, height), Image.ANTIALIAS)
         # Display new Image in window
+        global new_tk_image
         new_tk_image = ImageTk.PhotoImage(resized_img)
         lbl_image['image'] = new_tk_image
         lbl_image.image
-    
-    
-    
+        
 # Add Widgets to the bottom right frame
 START_DATE = date.fromisoformat('1995-06-16')
 today = date.today()
