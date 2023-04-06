@@ -100,16 +100,16 @@ def init_apod_cache(parent_dir):
         image_cache_dir = os.path.join(parent_dir,'images')
         print(f'Image cache directory: {image_cache_dir}')
         # check to see if directory exists.
-        if os.path.exists(image_cache_dir) == True:
+        if os.path.exists(image_cache_dir): 
             print('Image cache directory already exists.')
         else:
-            not os.path.isdir(image_cache_dir)
+            #not os.path.isdir(image_cache_dir) # TODO probly don't need this line
             os.makedirs(image_cache_dir)
             print('Image cache directory created.')    
         image_cache_db = os.path.join(image_cache_dir, 'image_cache.db')
         print(f'Image cache DB: {image_cache_db}')
         # Check to see if DB exists.
-        if os.path.exists(image_cache_db) == True:
+        if os.path.exists(image_cache_db):
             print('Image cache DB already exists.')
         else:
             not os.path.exists(image_cache_db)
@@ -161,6 +161,7 @@ def add_apod_to_cache(apod_date):
     # Download APOD image.
     apod_image_data = image_lib.download_image(image_url)
     if apod_image_data is None:
+        
         return 0
     # Get the SHA-256 value from response message content.
     image_sha256 = hashlib.sha256(apod_image_data).hexdigest()
@@ -324,6 +325,37 @@ def get_all_apod_titles():
         titles = [t[0] for t in cur]
         con.close()
         return titles
+    except Exception as error:
+        print(error)
+
+def get_apod_path_and_expl(apod_title):
+    
+    """Gets the explanation, and full path of the APOD having a specified
+    title from the DB.
+
+    Args:
+        image_id (int): ID of APOD in the DB
+
+    Returns:
+        dict: Dictionary of APOD information
+    """
+    try:
+        # Open connection to DB.
+        con = sqlite3.connect(image_cache_db)
+        cur = con.cursor()
+        # Define query to seach for image in DB.
+        find_image_query = """
+            SELECT explanation, path  FROM images
+            WHERE title = ? """
+        cur.execute(find_image_query, [apod_title])
+        explanation, path = cur.fetchone()
+        con.close
+        # Put information into a dictionary.
+        apod_info = {
+            'explanation': explanation,
+            'file_path': path,
+        }
+        return apod_info
     except Exception as error:
         print(error)
 
