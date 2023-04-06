@@ -103,7 +103,6 @@ def init_apod_cache(parent_dir):
         if os.path.exists(image_cache_dir): 
             print('Image cache directory already exists.')
         else:
-            #not os.path.isdir(image_cache_dir) # TODO probly don't need this line
             os.makedirs(image_cache_dir)
             print('Image cache directory created.')    
         image_cache_db = os.path.join(image_cache_dir, 'image_cache.db')
@@ -112,7 +111,6 @@ def init_apod_cache(parent_dir):
         if os.path.exists(image_cache_db):
             print('Image cache DB already exists.')
         else:
-            not os.path.exists(image_cache_db)
             # Open a connection to the database.
             con = sqlite3.connect(image_cache_db)
             # Get a cursor object that can be used to run SQL queries on the database.
@@ -161,7 +159,6 @@ def add_apod_to_cache(apod_date):
     # Download APOD image.
     apod_image_data = image_lib.download_image(image_url)
     if apod_image_data is None:
-        
         return 0
     # Get the SHA-256 value from response message content.
     image_sha256 = hashlib.sha256(apod_image_data).hexdigest()

@@ -29,20 +29,20 @@ apod_desktop.init_apod_cache(script_dir)
 root = Tk()
 root.minsize(800, 600)
 root.iconbitmap(os.path.join(script_dir, 'nasa_logo.ico'))
-ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('COMP593.PokeImageViewer')
+ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('Final-Project.apod_viewer')
 root.columnconfigure(0, weight=1)
-root.columnconfigure(1, weight=50)
-root.rowconfigure(0, weight=0)
-root.rowconfigure(1, weight=10)
-root.rowconfigure(2, weight=10)
+root.columnconfigure(1, weight=1)
+root.rowconfigure(0, weight=60)
+root.rowconfigure(1, weight=20)
+root.rowconfigure(2, weight=20)
 root.title('Astronomy Picture Of The Day')
 
 
 # Top frame for images
 top_frm = ttk.Frame(root)
 top_frm.grid(row=0, column=0, columnspan=2, pady=10, sticky=NSEW)
-top_frm.columnconfigure(0, weight=50) 
-top_frm.rowconfigure(0, weight=50)
+top_frm.columnconfigure(0, weight=1) 
+top_frm.rowconfigure(0, weight=1)
 
 # Middle frame for Image description
 middle_frm = ttk.Frame(root)
@@ -58,15 +58,15 @@ btm_left_frm.rowconfigure(2, weight=100)
 
 # Bottom Right frame for selecting Date
 btm_right_frm = ttk.LabelFrame(root, text="Get More Images")
-btm_right_frm.grid(row=2, column=1, padx=5, pady=5, sticky=SW)
-btm_right_frm.columnconfigure(1, weight=100)
-btm_right_frm.rowconfigure(2, weight=100)
+btm_right_frm.grid(row=2, column=1, padx=5, pady=5, sticky=SE)
+btm_right_frm.columnconfigure(1, weight=1)
+btm_right_frm.rowconfigure(2, weight=1)
 
 # Default Image Upon opening GUI
-bckgrd_image = Image.open(os.path.join(script_dir,"nasa.png")).resize((550,350))
+bckgrd_image = Image.open(os.path.join(script_dir,"nasa.png")).resize((600,400))
 nasa_logo = ImageTk.PhotoImage(bckgrd_image)
-lbl_logo = ttk.Label(top_frm, image=nasa_logo, anchor=CENTER)
-lbl_logo.grid(row=0, column=0, columnspan=2, padx=(10,10), pady=10,)
+lbl_image = ttk.Label(top_frm, image=nasa_logo, anchor=CENTER)
+lbl_image.grid(row=0, column=0, columnspan=2, padx=(10,10), pady=10,)
 
 def handle_set_desktop():
     apod_info = apod_desktop.get_apod_path_and_expl(cbox_title_sel.get())
@@ -106,9 +106,9 @@ def title_sel(event):
     resized_img = new_image.resize((width, height))
     new_tk_image = ImageTk.PhotoImage(resized_img)
     # Display new image in window
-    lbl_logo.config(image=new_tk_image)
-    root.minsize(800,800)
-    lbl_logo.image 
+    lbl_image.config(image=new_tk_image)
+    root.minsize(800,900)
+    lbl_image.image 
     
 # Bind button state to combobox
 cbox_title_sel.bind("<<ComboboxSelected>>", title_sel)
@@ -128,7 +128,13 @@ def download_image():
     lbl_desc['text'] = apod_info['explanation']
     cbox_title_sel.set(apod_info['title'])
     # Open new Image
-    new_image = Image.open(apod_info['file_path'])  
+    new_image = Image.open(apod_info['file_path'])
+    if apod_info['file_path'] is '':
+        err_msg = 'Unable to retrieve data for this date'
+        messagebox.showinfo(title='Error', message=err_msg, icon='error')
+
+    pass
+     
     # Find out the Image Size
     image_size = new_image.size
     # Scale the image to an appropriate size
@@ -136,8 +142,8 @@ def download_image():
     resized_img = new_image.resize((width, height))
     # Display new Image in window
     new_tk_image = ImageTk.PhotoImage(resized_img)
-    lbl_logo.config(image=new_tk_image)
-    lbl_logo.image
+    lbl_image.config(image=new_tk_image)
+    lbl_image.image
    
 # Add Widgets to the bottom right frame
 START_DATE = date.fromisoformat('1995-06-16')
