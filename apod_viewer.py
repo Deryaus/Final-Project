@@ -17,8 +17,6 @@ from PIL import Image, ImageTk
 from tkcalendar import DateEntry
 from datetime import date
 
-sys.stderr = open(os.devnull, 'w')
-
 # Determine the path and parent directory of this script
 script_path = os.path.abspath(inspect.getframeinfo(inspect.currentframe()).filename)
 script_dir = os.path.dirname(script_path)
@@ -28,7 +26,7 @@ apod_desktop.init_apod_cache(script_dir)
 
 # Create the main window
 root = Tk()
-root.minsize(800, 600)
+root.minsize(1100, 900)
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('Final-Project.apod_viewer')
 root.withdraw()
 root.iconbitmap(os.path.join(script_dir, 'nasa_logo_icon.ico'))
@@ -66,8 +64,8 @@ btm_right_frm.columnconfigure(1, weight=1)
 btm_right_frm.rowconfigure(2, weight=1)
 
 # Default Image Upon opening GUI
-bckgrd_image = Image.open(os.path.join(script_dir,"NASA_logo.png")).resize((600,400))
-nasa_logo = ImageTk.PhotoImage(bckgrd_image, Image.ANTIALIAS)
+bckgrd_image = Image.open(os.path.join(script_dir,"NASA_logo.png")).resize((800,600))
+nasa_logo = ImageTk.PhotoImage(bckgrd_image, Image.LANCZOS)
 lbl_image = ttk.Label(top_frm, image=nasa_logo, anchor=CENTER)
 lbl_image.grid(row=0, column=0, columnspan=2, padx=(10,10), pady=10,)
 
@@ -78,7 +76,7 @@ lbl_cache.grid(row=0, column=0, padx=5, pady=10, sticky=W)
 # Get list of titles from DB and pass to combobox
 global cache_list
 cache_list = sorted(apod_desktop.get_all_apod_titles())
-cbox_title_sel = ttk.Combobox(btm_left_frm, width=40, values=cache_list, state='readonly')
+cbox_title_sel = ttk.Combobox(btm_left_frm, width=80, values=cache_list, state='readonly')
 cbox_title_sel.set('Select An Image')
 cbox_title_sel.grid(row=0, column=1, padx=(5,0), pady=10, sticky=W)
 
@@ -93,13 +91,13 @@ btn_set_dsktp.grid(row=0, column=3, padx=5, pady=10, sticky=W)
 
 # Add Widget to middle frame
 lbl_desc = ttk.Label(middle_frm, text='Discover the cosmos! Each day a different image or photograph of our fascinating universe is \
-featured, along with a brief explanation written by a professional astronomer.', anchor=CENTER, wraplength=750)
+featured, along with a brief explanation written by a professional astronomer.', anchor=CENTER, wraplength=1050)
 lbl_desc.grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky=NSEW)
 
 # Handle title selection event
 def title_sel(event):
     # Change min size of window
-    root.minsize(800,900)
+    root.minsize(1100,900)
     # Enable set as desktop button upon selection
     if cbox_title_sel.current() != -1:
         btn_set_dsktp.config(state=NORMAL)
@@ -112,11 +110,12 @@ def title_sel(event):
     image_size = new_image.size
     # Scale the image to an appropriate size
     width, height = image_lib.scale_image(image_size)
-    resized_img = new_image.resize((width, height), Image.ANTIALIAS)
+    resized_img = new_image.resize((width, height), Image.LANCZOS)
     new_tk_image = ImageTk.PhotoImage(resized_img)
     # Display new image in window
+    lbl_image.new_tk_image = new_tk_image
     lbl_image['image'] = new_tk_image
-    lbl_image.image 
+    
     
 # Bind title select to combobox
 cbox_title_sel.bind("<<ComboboxSelected>>", title_sel)
@@ -124,7 +123,7 @@ cbox_title_sel.bind("<<ComboboxSelected>>", title_sel)
 # Create Download Image Event handle
 def download_image():
     # Change the min size of the window
-    root.minsize(800,900)
+    root.minsize(1100,900)
     # Enable Set desktop button upon donwloading image
     btn_set_dsktp.config(state=NORMAL)
     # Retrieve Date from Calender
@@ -150,12 +149,12 @@ def download_image():
         image_size = new_image.size
         # Scale the image to an appropriate size
         width, height = image_lib.scale_image(image_size)
-        resized_img = new_image.resize((width, height), Image.ANTIALIAS)
+        resized_img = new_image.resize((width, height), Image.LANCZOS)
         # Display new Image in window
-        global new_tk_image
         new_tk_image = ImageTk.PhotoImage(resized_img)
+        lbl_image.new_tk_image = new_tk_image
         lbl_image['image'] = new_tk_image
-        lbl_image.image
+        
         
 # Add Widgets to the bottom right frame
 START_DATE = date.fromisoformat('1995-06-16')
