@@ -26,7 +26,7 @@ apod_desktop.init_apod_cache(script_dir)
 
 # Create the main window
 root = Tk()
-root.minsize(1100, 900)
+root.minsize(1050, 800)
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('Final-Project.apod_viewer')
 root.withdraw()
 root.iconbitmap(os.path.join(script_dir, 'nasa_logo_icon.ico'))
@@ -64,7 +64,7 @@ btm_right_frm.columnconfigure(1, weight=1)
 btm_right_frm.rowconfigure(2, weight=1)
 
 # Default Image Upon opening GUI
-bckgrd_image = Image.open(os.path.join(script_dir,"NASA_logo.png")).resize((800,600))
+bckgrd_image = Image.open(os.path.join(script_dir,"NASA_logo.png")).resize((725,525))
 nasa_logo = ImageTk.PhotoImage(bckgrd_image, Image.LANCZOS)
 lbl_image = ttk.Label(top_frm, image=nasa_logo, anchor=CENTER)
 lbl_image.grid(row=0, column=0, columnspan=2, padx=(10,10), pady=10,)
@@ -90,7 +90,7 @@ btn_set_dsktp.grid(row=0, column=3, padx=5, pady=10, sticky=W)
 
 # Add Widget to middle frame
 lbl_desc = ttk.Label(middle_frm, text='Discover the cosmos! Each day a different image or photograph of our fascinating universe is \
-featured, along with a brief explanation written by a professional astronomer.', anchor=CENTER, wraplength=1050)
+featured, along with a brief explanation written by a professional astronomer.', anchor=CENTER, wraplength=1000)
 lbl_desc.grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky=NSEW)
 
 # Handle title selection event
@@ -108,7 +108,7 @@ def title_sel(event):
     # Find out the Image Size
     image_size = new_image.size
     # Scale the image to an appropriate size
-    width, height = image_lib.scale_image(image_size)
+    width, height = image_lib.scale_image(image_size, (725,525))
     resized_img = new_image.resize((width, height), Image.LANCZOS)
     new_tk_image = ImageTk.PhotoImage(resized_img)
     # Display new image in window
@@ -147,7 +147,7 @@ def download_image():
         # Find out the Image Size
         image_size = new_image.size
         # Scale the image to an appropriate size
-        width, height = image_lib.scale_image(image_size)
+        width, height = image_lib.scale_image(image_size, (725,525))
         resized_img = new_image.resize((width, height), Image.LANCZOS)
         # Display new Image in window
         new_tk_image = ImageTk.PhotoImage(resized_img)
@@ -157,11 +157,14 @@ def download_image():
         
 # Add Widgets to the bottom right frame
 START_DATE = date.fromisoformat('1995-06-16')
-today = date.today()
 lbl_sel_date = ttk.Label(btm_right_frm, text='Select a Date:')
 lbl_sel_date.grid(row=0, column=0, padx=5, pady=10, sticky=SE)
-cal = DateEntry(btm_right_frm, maxdate=today, mindate=START_DATE, state='readonly', date_pattern='yyyy-mm-dd') 
+
+# Create Calender to choose date
+cal = DateEntry(btm_right_frm, maxdate=date.today(), mindate=START_DATE, state='readonly', date_pattern='yyyy-mm-dd', background='grey', \
+showweeknumbers=False, firstweekday='sunday', foreground='black', weekendbackground='white', showothermonthdays=False) 
 cal.grid(row=0, column=2,padx=5, pady=10, sticky=E)
+
 # Create download image button
 btn_dwnld_img = ttk.Button(btm_right_frm, text="Download Image", command=download_image)
 btn_dwnld_img.grid(row=0, column=3, padx=5, pady=10, sticky=SE)
