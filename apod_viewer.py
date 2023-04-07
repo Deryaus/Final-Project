@@ -9,7 +9,7 @@ Usage:
   python apod_viewer.py 
 
 --------------------ι𝐍Ⓙย𝐬𝓣ᶤςⒺ Ⓐ𝐍ＹωᕼⒺг𝐄 ᶤ𝐬 ᵃ tｈяᗴＡт ⓉＯ 𝐣υ𝔰ｔ𝐢ᶜⓔ 𝐄V乇яｙ山卄εŘ乇 --------------------"""
-import inspect, os, apod_desktop, image_lib, ctypes, sys
+import inspect, os, apod_desktop, image_lib, ctypes
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
@@ -74,7 +74,6 @@ lbl_cache = ttk.Label(btm_left_frm, text='Select an Image:')
 lbl_cache.grid(row=0, column=0, padx=5, pady=10, sticky=W)
 
 # Get list of titles from DB and pass to combobox
-global cache_list
 cache_list = sorted(apod_desktop.get_all_apod_titles())
 cbox_title_sel = ttk.Combobox(btm_left_frm, width=80, values=cache_list, state='readonly')
 cbox_title_sel.set('Select An Image')
@@ -97,7 +96,7 @@ lbl_desc.grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky=NSEW)
 # Handle title selection event
 def title_sel(event):
     # Change min size of window
-    root.minsize(1100,900)
+    #root.minsize(1100,900)
     # Enable set as desktop button upon selection
     if cbox_title_sel.current() != -1:
         btn_set_dsktp.config(state=NORMAL)
@@ -123,7 +122,7 @@ cbox_title_sel.bind("<<ComboboxSelected>>", title_sel)
 # Create Download Image Event handle
 def download_image():
     # Change the min size of the window
-    root.minsize(1100,900)
+    #root.minsize(1100,900)
     # Enable Set desktop button upon donwloading image
     btn_set_dsktp.config(state=NORMAL)
     # Retrieve Date from Calender
