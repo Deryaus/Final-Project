@@ -95,8 +95,6 @@ lbl_desc.grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky=NSEW)
 
 # Handle title selection event
 def title_sel(event):
-    # Change min size of window
-    #root.minsize(1100,900)
     # Enable set as desktop button upon selection
     if cbox_title_sel.current() != -1:
         btn_set_dsktp.config(state=NORMAL)
@@ -115,14 +113,11 @@ def title_sel(event):
     lbl_image.new_tk_image = new_tk_image
     lbl_image['image'] = new_tk_image
     
-    
 # Bind title select to combobox
 cbox_title_sel.bind("<<ComboboxSelected>>", title_sel)
 
 # Create Download Image Event handle
 def download_image():
-    # Change the min size of the window
-    #root.minsize(1100,900)
     # Enable Set desktop button upon donwloading image
     btn_set_dsktp.config(state=NORMAL)
     # Retrieve Date from Calender
@@ -153,7 +148,6 @@ def download_image():
         new_tk_image = ImageTk.PhotoImage(resized_img)
         lbl_image.new_tk_image = new_tk_image
         lbl_image['image'] = new_tk_image
-        
         
 # Add Widgets to the bottom right frame
 START_DATE = date.fromisoformat('1995-06-16')

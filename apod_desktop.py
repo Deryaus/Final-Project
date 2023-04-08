@@ -230,12 +230,14 @@ def get_apod_id_from_db(image_sha256):
     Returns:
         int: Record ID of the APOD in the image cache DB, if it exists. Zero, if it does not.
     """
+    # Open connection to DB.
     con = sqlite3.connect(image_cache_db)
     cur = con.cursor()
     # Define query to seach for image in DB.
     find_image_query = """
     SELECT ID FROM images
      WHERE sha_256 = ? """
+    # Execute Query
     cur.execute(find_image_query, [image_sha256])
     query_result = cur.fetchone()
     con.close
