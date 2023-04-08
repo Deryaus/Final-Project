@@ -169,11 +169,5 @@ cal.grid(row=0, column=2,padx=5, pady=10, sticky=W)
 btn_dwnld_img = ttk.Button(btm_right_frm, text="Download Image ", command=download_image, width=18)
 btn_dwnld_img.grid(row=0, column=3, padx=5, pady=10, sticky=W)
 
-width = root.winfo_screenwidth()
-height = root.winfo_screenheight()
-
-print(width)
-print(height)
-
 # loop until window closes
 root.mainloop()
