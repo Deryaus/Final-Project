@@ -26,7 +26,7 @@ apod_desktop.init_apod_cache(script_dir)
 
 # Create the main window
 root = Tk()
-root.minsize(1050, 800)
+root.minsize(1100, 800)
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('Final-Project.apod_viewer')
 root.withdraw()
 root.iconbitmap(os.path.join(script_dir, 'nasa_logo_icon.ico'))
@@ -85,12 +85,12 @@ def handle_set_desktop():
     image_lib.set_desktop_background_image(apod_info['file_path'])
     
 # Create set as desktop button
-btn_set_dsktp = ttk.Button(btm_left_frm, text='Set As Desktop', command=handle_set_desktop, state=DISABLED) 
+btn_set_dsktp = ttk.Button(btm_left_frm, text='Set As Desktop', command=handle_set_desktop, state=DISABLED, width=18) 
 btn_set_dsktp.grid(row=0, column=3, padx=5, pady=10, sticky=W)
 
 # Add Widget to middle frame
 lbl_desc = ttk.Label(middle_frm, text='Discover the cosmos! Each day a different image or photograph of our fascinating universe is \
-featured, along with a brief explanation written by a professional astronomer.', anchor=CENTER, wraplength=1000)
+featured, along with a brief explanation written by a professional astronomer.', anchor=CENTER, wraplength=1050)
 lbl_desc.grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky=NSEW)
 
 # Handle title selection event
@@ -158,16 +158,22 @@ def download_image():
 # Add Widgets to the bottom right frame
 START_DATE = date.fromisoformat('1995-06-16')
 lbl_sel_date = ttk.Label(btm_right_frm, text='Select a Date:')
-lbl_sel_date.grid(row=0, column=0, padx=5, pady=10, sticky=SE)
+lbl_sel_date.grid(row=0, column=0, padx=5, pady=10, sticky=W)
 
 # Create Calender to choose date
 cal = DateEntry(btm_right_frm, maxdate=date.today(), mindate=START_DATE, state='readonly', date_pattern='yyyy-mm-dd', background='grey', \
 showweeknumbers=False, firstweekday='sunday', foreground='black', weekendbackground='white', showothermonthdays=False) 
-cal.grid(row=0, column=2,padx=5, pady=10, sticky=E)
+cal.grid(row=0, column=2,padx=5, pady=10, sticky=W)
 
 # Create download image button
-btn_dwnld_img = ttk.Button(btm_right_frm, text="Download Image", command=download_image)
-btn_dwnld_img.grid(row=0, column=3, padx=5, pady=10, sticky=SE)
+btn_dwnld_img = ttk.Button(btm_right_frm, text="Download Image ", command=download_image, width=18)
+btn_dwnld_img.grid(row=0, column=3, padx=5, pady=10, sticky=W)
+
+width = root.winfo_screenwidth()
+height = root.winfo_screenheight()
+
+print(width)
+print(height)
 
 # loop until window closes
 root.mainloop()
