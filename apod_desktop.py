@@ -173,6 +173,7 @@ def add_apod_to_cache(apod_date):
         image_id == 0
         print('APOD image is not already in cache.')
         file_path = determine_apod_file_path(apod_info_dict['title'], image_url)
+        print(f'Apod file path: {file_path}')  
         image_lib.save_image_file(apod_image_data, file_path)
         image_id = add_apod_to_db(apod_info_dict['title'], apod_info_dict['explanation'], file_path, image_sha256, apod_date)
         return image_id
@@ -275,7 +276,7 @@ def determine_apod_file_path(image_title, image_url):
     file_extension = file_type.group(1)
     # Cleanup title - remove non word chars, leading and trailing whitespaces, inner spaces replaced with underscores.
     cleaned_string = re.sub('\W', '', re.sub('\s', '_', image_title.strip()))
-    file_path = os.path.join(image_cache_dir, cleaned_string + file_extension)   
+    file_path = os.path.join(image_cache_dir, cleaned_string + file_extension) 
     return file_path
 
 def get_apod_info(image_id):
