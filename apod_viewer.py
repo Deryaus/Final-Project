@@ -64,7 +64,7 @@ btm_right_frm.columnconfigure(1, weight=1)
 btm_right_frm.rowconfigure(2, weight=1)
 
 # Default Image Upon opening GUI
-bckgrd_image = Image.open(os.path.join(script_dir,"NASA_logo.png")).resize((725,525))
+bckgrd_image = Image.open(os.path.join(script_dir,"NASA_logo1.png")).resize((725,525))
 nasa_logo = ImageTk.PhotoImage(bckgrd_image, Image.LANCZOS)
 lbl_image = ttk.Label(top_frm, image=nasa_logo, anchor=CENTER)
 lbl_image.grid(row=0, column=0, columnspan=2, padx=(10,10), pady=10,)
